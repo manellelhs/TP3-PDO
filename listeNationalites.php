@@ -3,7 +3,16 @@
 include "connexionPdo.php";
 
 // liste nat
-$req=$monPdo->prepare("select n.num, n.libelle as 'libNat', c.libelle as 'libCont' from nationalite n, continent c where n.numContinent=c.num order by n.libelle");
+//construction de la requete
+$textReq=("select n.num, n.libelle as 'libNat', c.libelle as 'libCont' from nationalite n, continent c where n.numContinent=c.num");
+if(!empty($_GET)){
+  if($_GET['libelle'] !=""){$textReq.="and n.libelle like '%" .$_GET['libelle']."%'";}
+  if($_GET['continent'] !=""){$textReq.="ande c.num = " .$_GET['continent'];}
+
+}
+$textReq.="order by n.libelle";
+
+$req=$monPdo->prepare($textReq);
 $req->setFetchMode(PDO::FETCH_OBJ);
 $req->execute();
 $lesNationalites=$req->fetchAll();
@@ -29,14 +38,24 @@ $_SESSION['message']=[];
 }
 
 ?>
-<div class="row mt-2">
-  <form action="" method="get" class="border border-primary rounded p-3">
-    <div class="row">
-      <div class="col">
-        <input type="text" class='form-control' id='libelle' placehoder='Saisir le libelle' name='libelle' value="<?php if($action == "Modifier") { echo $laNationalite->libelle;} ?>">
-      </div>
-      <div class="col">
-      <select name="continent" class="form-control">
+
+
+
+<div class="container mt-5">
+
+<div class="row pt-3">
+<div class="col-9"><h2>LISTE DES NATIONALITES</h2></div>
+<div class="col-3"><a href="formNat.php?action=Ajouter" class='btn btn-success'><i class="fas fa-plus-circle"></i> Créer une nationalité</a></div>
+</div>
+
+<form action="" method="get" class="border border-primary rounded p-3 mt-3 mb-3">
+  <div class="row">
+    <div class="col">
+    <input type="text" class='form-control' id='libelle' placehoder='Saisir le libelle' name='libelle' value="">
+    </div>
+
+    <div class="col">
+    <select name="continent" class="form-control">
             <?php
               foreach($lesContinents as $continent){
                 $selection=$continent->num ==  $laNationalite->numContinent ? 'selected' : '';
@@ -45,26 +64,12 @@ $_SESSION['message']=[];
             ?>
 
           </select>
-      </div>
-      <div class="col">
-        <button type="submit"class="btn btn-success btn-block"> Rechercher</button>
-      </div>
     </div>
-
-  </form>
-</div>
-
-<div class="container mt-5">
-
-<div class="row pt-3">
-<div class="col-9"><h2>LISTE DES NATIONALITES</h2></div>
-<div class="col-3"><a href="formNat.php?action=Ajouter" class='btn btn-success'><i class="fas fa-plus-circle"></i> Créer une nationalité</a></div>
-
-
-</div>
-
-
-
+    <div class="col">
+      <button type="submit" class="btn btn-success btn block"> RECHERCHER </button>
+    </div>
+  </div>
+</form>
 
 
 

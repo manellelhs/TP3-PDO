@@ -10,9 +10,10 @@ include "connexionPdo.php";
   $req->bindParam(':num',$num);
   $req->execute();
   $laNationalite=$req->fetch();
-     //liste continents
-
+     
   }
+  //liste continents
+
   $reqCont=$monPdo->prepare("select * from continent");
   $reqCont->setFetchMode(PDO::FETCH_OBJ);
   $reqCont->execute();
