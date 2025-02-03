@@ -2,20 +2,27 @@
 <?php include "header.php";
 include "connexionPdo.php";
 
+
+$libelle="";
+$continentSel="Tous";
+
 // liste nat
 //construction de la requete
-$textReq=("select n.num, n.libelle as 'libNat', c.libelle as 'libCont' from nationalite n, continent c where n.numContinent=c.num");
+$textReq="select n.num, n.libelle as 'libNat', c.libelle as 'libCont' from nationalite n, continent c where n.numContinent=c.num";
 if(!empty($_GET)){
-  if($_GET['libelle'] !=""){$textReq.="and n.libelle like '%" .$_GET['libelle']."%'";}
-  if($_GET['continent'] !=""){$textReq.="ande c.num = " .$_GET['continent'];}
+  $libelle=$_GET['libelle'];
+  $continentSel=$_GET['continent'];
+  if($libelle !="") { $textReq.= " and n.libelle like '%" .$libelle. "%'";}
+  if($continentSel !="Tous") {$textReq.=" and c.num = " .$continentSel;}
 
 }
-$textReq.="order by n.libelle";
+$textReq.=" order by n.libelle";
 
 $req=$monPdo->prepare($textReq);
 $req->setFetchMode(PDO::FETCH_OBJ);
 $req->execute();
 $lesNationalites=$req->fetchAll();
+
 
 //liste Cont
 $reqCont=$monPdo->prepare("select * from continent");
@@ -51,14 +58,15 @@ $_SESSION['message']=[];
 <form action="" method="get" class="border border-primary rounded p-3 mt-3 mb-3">
   <div class="row">
     <div class="col">
-    <input type="text" class='form-control' id='libelle' placehoder='Saisir le libelle' name='libelle' value="">
+    <input type="text" class='form-control' id='libelle' placehoder='Saisir le libelle' name='libelle' value=" <?php echo $libelle; ?>">
     </div>
 
     <div class="col">
     <select name="continent" class="form-control">
             <?php
+              echo "<option value='Tous'>TOUS LES CONTINENTS</option>";
               foreach($lesContinents as $continent){
-                $selection=$continent->num ==  $laNationalite->numContinent ? 'selected' : '';
+                $selection=$continent->num ==  $continentSel ? 'selected' : '';
                 echo "<option value='$continent->num' $selection>$continent->libelle</option>";
               }
             ?>
